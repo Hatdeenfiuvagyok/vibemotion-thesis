@@ -1,12 +1,10 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import PlaylistList from "./components/PlaylistList";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>asd</p>
-      </header>
+    <div className="App bg-gray-50 min-h-screen">
+      <PlaylistList />
     </div>
   );
 }
