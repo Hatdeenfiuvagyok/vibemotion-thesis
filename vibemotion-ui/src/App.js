@@ -21,7 +21,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-center pt-10">Vibemotion 🎧</h1>
+      <h1 className="text-4xl font-bold text-center pt-10">Vibemotion</h1>
 
       {/* 🔹 AuthModal — itt jelenik meg a Register/Login gomb */}
       <AuthModal />

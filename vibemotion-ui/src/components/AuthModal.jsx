@@ -1,4 +1,3 @@
-// src/components/AuthModal.jsx
 import React, { useState } from "react";
 
 const AuthModal = () => {
