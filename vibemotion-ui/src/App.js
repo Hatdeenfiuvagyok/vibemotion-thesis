@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SearchBar from "./components/SearchBar";
 import MoodCards from "./components/MoodCards";
+import AuthModal from "./components/AuthModal";
 import axios from "axios";
 
 function App() {
@@ -22,10 +23,12 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center">
       <h1 className="text-4xl font-bold text-center pt-10">Vibemotion 🎧</h1>
 
+      {/* 🔹 AuthModal — itt jelenik meg a Register/Login gomb */}
+      <AuthModal />
+
       <SearchBar />
       <MoodCards onSelectMood={handleMoodSelect} />
 
-      {/* Megjelenítés (egyelőre egyszerű) */}
       {showDropdown && playlists.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 p-6 w-full max-w-5xl">
           {playlists.map((p) => (
