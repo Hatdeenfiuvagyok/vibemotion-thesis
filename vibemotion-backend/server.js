@@ -9,10 +9,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Spotify token endpoint
+// ============================================================
+//                Spotify Access Token Endpoint
+// ============================================================
 app.get("/api/token", async (req, res) => {
-  const clientId = process.env.SPOTIFY_CLIENT_ID;
-  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env;
 
   try {
     const response = await axios.post(
@@ -21,7 +22,7 @@ app.get("/api/token", async (req, res) => {
       {
         headers: {
           Authorization:
-            "Basic " + Buffer.from(clientId + ":" + clientSecret).toString("base64"),
+            "Basic " + Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString("base64"),
           "Content-Type": "application/x-www-form-urlencoded",
         },
       }
@@ -34,21 +35,21 @@ app.get("/api/token", async (req, res) => {
   }
 });
 
-// Get playlists by mood
+// ============================================================
+//            Search playlists by mood or keyword
+// ============================================================
 app.get("/api/playlists", async (req, res) => {
-  const { mood } = req.query; // e.g. happy, sad, chill
+  const { mood } = req.query;
 
   try {
-    // Get access token
+    //  Token lekérése
     const tokenResponse = await axios.post(
       "https://accounts.spotify.com/api/token",
       new URLSearchParams({ grant_type: "client_credentials" }),
       {
         headers: {
           Authorization:
-            "Basic " + Buffer.from(
-              process.env.SPOTIFY_CLIENT_ID + ":" + process.env.SPOTIFY_CLIENT_SECRET
-            ).toString("base64"),
+            "Basic " + Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString("base64"),
           "Content-Type": "application/x-www-form-urlencoded",
         },
       }
@@ -56,13 +57,11 @@ app.get("/api/playlists", async (req, res) => {
 
     const accessToken = tokenResponse.data.access_token;
 
-    // Search playlists by mood
+    // 2Playlist keresés
     const searchResponse = await axios.get(
       `https://api.spotify.com/v1/search?q=${mood}&type=playlist&limit=10`,
       {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
 
@@ -73,7 +72,8 @@ app.get("/api/playlists", async (req, res) => {
   }
 });
 
-
-
+// ============================================================
+//  🚀 Server indítása
+// ============================================================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
