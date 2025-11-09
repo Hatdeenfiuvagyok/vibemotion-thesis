@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 
 function SearchBar() {
   const [mood, setMood] = useState("");
@@ -7,7 +8,7 @@ function SearchBar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const containerRef = useRef(null);
 
-  // API hívás a kereséshez
+  // 🔍 API hívás
   const handleSearch = async (value) => {
     setMood(value);
     if (value.trim() === "") {
@@ -25,7 +26,7 @@ function SearchBar() {
     }
   };
 
-  // bezárás ha rákattintunk máshova
+  // 🧠 Bezárás ha máshova kattintunk
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -37,40 +38,55 @@ function SearchBar() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-md mx-auto mt-8">
-      <input
-        type="text"
-        placeholder="Enter a mood (happy, chill, sad...)"
-        value={mood}
-        onChange={(e) => handleSearch(e.target.value)}
-        className="w-full p-3 rounded-md border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring focus:ring-green-500"
-      />
+    <div ref={containerRef} className="relative w-full max-w-md mx-auto mt-10">
+      {/* 🔹 Input mező */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Enter a mood (happy, chill, sad...)"
+          value={mood}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full p-3 rounded-xl border border-neon-purple/40 bg-neon-dark/60 
+                     text-white focus:outline-none focus:ring-2 focus:ring-neon-purple
+                     placeholder-gray-400 shadow-[0_0_10px_#a855f755] transition-all duration-300"
+        />
+        <div className="absolute right-3 top-3 text-neon-glow">🎵</div>
+      </div>
 
-      {showDropdown && playlists.length > 0 && (
-        <div className="absolute left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50">
-          {playlists.map((p) => (
-            <a
-              key={p.id}
-              href={p.external_urls.spotify}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-3 hover:bg-gray-800 transition"
-            >
-              <img
-                src={p.images[0]?.url}
-                alt={p.name}
-                className="w-12 h-12 object-cover rounded-md"
-              />
-              <div>
-                <h3 className="font-semibold text-white">{p.name}</h3>
-                <p className="text-sm text-gray-400 line-clamp-1">
-                  {p.description || "No description"}
-                </p>
-              </div>
-            </a>
-          ))}
-        </div>
-      )}
+      {/* 🔹 Dropdown animáció */}
+      <AnimatePresence>
+        {showDropdown && playlists.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute left-0 right-0 mt-2 bg-gradient-to-br from-neon-dark to-black/90 
+                       border border-neon-purple/40 rounded-xl shadow-[0_0_20px_#a855f755]
+                       max-h-80 overflow-y-auto z-50 backdrop-blur-sm"
+          >
+            {playlists.map((p) => (
+              <a
+                key={p.id}
+                href={p.external_urls.spotify}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 hover:bg-neon-purple/20 transition-all duration-200"
+              >
+                <img
+                  src={p.images[0]?.url}
+                  alt={p.name}
+                  className="w-12 h-12 object-cover rounded-md border border-neon-purple/40"
+                />
+                <div>
+                  <h3 className="font-semibold text-neon-glow drop-shadow-sm">{p.name}</h3>
+                  <p className="text-sm text-gray-400 line-clamp-1">{p.description || "No description"}</p>
+                </div>
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,31 +1,26 @@
 import React from "react";
 
-function PlaylistList({ playlists }) {
-  if (!playlists.length) {
-    return <p className="text-center mt-10 text-gray-400">No playlists found. Try searching a mood!</p>;
-  }
+const moods = ["Happy", "Chill", "Sad", "Focus", "Energy", "Love"];
 
+function MoodCards({ onSelectMood }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 p-8">
-      {playlists.map((p) => (
-        <a
-          key={p.id}
-          href={p.external_urls.spotify}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="border rounded-xl shadow-lg hover:scale-105 transition-transform p-4 bg-white text-black"
+    <div className="flex flex-wrap justify-center gap-5 mt-10">
+      {moods.map((mood, i) => (
+        <button
+          key={i}
+          onClick={() => onSelectMood(mood)}
+          className="px-6 py-3 text-lg font-semibold text-white rounded-xl 
+                     bg-gradient-to-br from-neon-purple to-neon-dark 
+                     shadow-[0_0_15px_#a855f7]
+                     hover:shadow-[0_0_30px_#a855f7] 
+                     hover:scale-105 hover:from-neon-glow hover:to-neon-purple 
+                     transition-all duration-300"
         >
-          <img
-            src={p.images[0]?.url}
-            alt={p.name}
-            className="rounded-lg mb-4 w-full h-48 object-cover"
-          />
-          <h2 className="text-xl font-semibold">{p.name}</h2>
-          <p className="text-sm text-gray-600 mt-2">{p.description || "No description"}</p>
-        </a>
+          {mood}
+        </button>
       ))}
     </div>
   );
 }
 
-export default PlaylistList;
+export default MoodCards;
