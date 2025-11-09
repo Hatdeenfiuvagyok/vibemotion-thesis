@@ -21,14 +21,17 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-center pt-10">Vibemotion</h1>
+      {/* 🔹 Header */}
+      <div className="w-full flex justify-between items-center p-6">
+        <h1 className="text-4xl font-bold">Vibemotion 🎧</h1>
+        <AuthModal />
+      </div>
 
-      {/* 🔹 AuthModal — itt jelenik meg a Register/Login gomb */}
-      <AuthModal />
-
+      {/* 🔹 Search + MoodCards */}
       <SearchBar />
       <MoodCards onSelectMood={handleMoodSelect} />
 
+      {/* 🔹 Eredmények */}
       {showDropdown && playlists.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 p-6 w-full max-w-5xl">
           {playlists.map((p) => (
