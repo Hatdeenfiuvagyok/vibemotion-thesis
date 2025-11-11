@@ -3,19 +3,19 @@ import React from "react";
 const moods = [
   {
     name: "Happy",
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
+    image: "/assets/moods/moodcards_happy.jpg",
   },
   {
     name: "Chill",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800",
+    image: "/assets/moods/moodcards_chill2.jpeg",
   },
   {
     name: "Sad",
-    image: "https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee?w=800",
+    image: "/assets/moods/moodcards_sad.jpg",
   },
   {
     name: "Focus",
-    image: "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?w=800",
+    image: "/assets/moods/moodcards_focus.png",
   },
   {
     name: "Energy",
@@ -23,12 +23,11 @@ const moods = [
   },
   {
     name: "Love",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800",
+    image: "/assets/moods/moodcards_love.jpg",
   },
 ];
 
 function MoodCards({ onSelectMood }) {
-  // ez kezeli az egérmozgást és 3D döntést
   const handleMouseMove = (e) => {
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
