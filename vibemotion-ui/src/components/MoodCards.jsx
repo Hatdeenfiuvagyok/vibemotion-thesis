@@ -36,7 +36,7 @@ function MoodCards({ onSelectMood }) {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -12; // ha lent az egér, hátradől
+    const rotateX = ((y - centerY) / centerY) * -12; 
     const rotateY = ((x - centerX) / centerX) * 12;
 
     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.06)`;

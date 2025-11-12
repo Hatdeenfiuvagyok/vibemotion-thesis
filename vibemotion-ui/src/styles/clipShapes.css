@@ -1,0 +1,15 @@
+.panel-clip {
+  border-top-left-radius: 20% 50%;
+  border-bottom-left-radius: 20% 50%;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  transition: all 0.5s ease-in-out;
+}
+
+/* Mobil: teljes szélesség, nincs lekerekítés */
+@media (max-width: 639px) {
+  .panel-clip {
+    border-radius: 0;
+    width: 100%;
+  }
+}
