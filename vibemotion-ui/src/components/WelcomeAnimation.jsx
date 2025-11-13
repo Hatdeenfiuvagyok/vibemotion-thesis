@@ -1,25 +1,20 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 
-export default function WelcomeAnimation({ username, onFinish }) {
+export default function WelcomeAnimation({ onComplete }) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onFinish();
-    }, 2500); // 2.5 másodperc
+      if (onComplete) onComplete();
+    }, 3000); // 3 másodperc után navigál
     return () => clearTimeout(timer);
-  }, [onFinish]);
+  }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#2a0a4a] to-[#100018] z-50 text-white">
-      <motion.h1
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 1 }}
-        className="text-4xl font-bold drop-shadow-[0_0_20px_#a855f7]"
-      >
-        Welcome back, {username}!
-      </motion.h1>
-    </div>
+    <motion.div
+      className="absolute bottom-0 left-0 h-1 bg-neon-purple w-full"
+      initial={{ width: 0 }}
+      animate={{ width: "100%" }}
+      transition={{ duration: 3, ease: "easeInOut" }}
+    />
   );
 }
