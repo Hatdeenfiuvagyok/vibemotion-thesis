@@ -1,31 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SearchBar from "../components/SearchBar";
-import MoodCards from "../components/MoodCards";
 import axios from "axios";
 import SideBar from "../components/SideBar";
+import MoodCards, { moods } from "../components/MoodCards";
+import SearchBar from "../components/SearchBar";
+import CategoryBar from "../components/CategoryBar";
 
 export default function MainPage() {
-  const [playlists, setPlaylists] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [username, setUsername] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [playlists, setPlaylists] = useState([]);
   const navigate = useNavigate();
 
-  // Bezárjuk a mobil sidebar-t, ha felnagyítják az ablakot desktop/tablet méretre
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) { // md breakpoint Tailwind szerint
-        setSidebarOpen(false);
-      }
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
+  // Felhasználó lekérése
   useEffect(() => {
     const token = localStorage.getItem("vibemotion_token");
     if (!token) navigate("/auth");
@@ -42,39 +30,51 @@ export default function MainPage() {
     }
   }, [navigate]);
 
-  const handleMoodSelect = async (mood) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/playlists?mood=${mood}`
-      );
-      const filtered = response.data.filter((p) => p !== null);
-      setPlaylists(filtered);
-      setShowDropdown(true);
-    } catch (error) {
-      console.error("Error fetching playlists:", error);
-    }
-  };
+  // Mobil sidebar automatikus bezárása resizekor
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setSidebarOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("vibemotion_token");
-    setUsername(null);
     navigate("/auth");
   };
 
+  // Mood kiválasztás → Spotify API lekérdezés
+  const handleMoodSelect = async (moodName) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/playlists?mood=${moodName}`
+      );
+      const filtered = response.data.filter((p) => p !== null);
+      setPlaylists(filtered);
+    } catch (error) {
+      console.error("Spotify playlists fetch error:", error);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-[#1a002e] to-[#3b0066] text-white flex flex-col">
+    <div
+      className="min-h-screen text-white flex flex-col"
+      style={{
+        background: "linear-gradient(to bottom, #000000, #1a002e, #3b0066)",
+        backgroundAttachment: "fixed",
+      }}
+    >
       {/* Navbar */}
       <div className="w-full flex justify-between items-center p-6 fixed top-0 left-0 z-50
                       bg-black/70 backdrop-blur-md">
         <div className="flex items-center gap-4">
-          {/* Hamburger mobilon */}
           <button
             className="text-white text-2xl md:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             &#9776;
           </button>
-
           <h1 className="text-3xl font-bold text-neon-glow drop-shadow-[0_0_10px_#a855f7]">
             Vibemotion
           </h1>
@@ -94,23 +94,30 @@ export default function MainPage() {
       </div>
 
       <div className="flex pt-24">
-        {/* Sidebar minden eszközre */}
+        {/* Sidebar */}
         <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        {/* Desktop padding-left a sidebar szélességhez */}
-        <div className="flex-1 md:ml-60 px-8">
-          {/* Search */}
-          <div className="mt-6 flex flex-col items-center">
+        {/* Main content */}
+        <div className="flex-1 md:ml-60 px-4 sm:px-8">
+          {/* SearchBar */}
+          <div className="mt-4">
             <SearchBar />
           </div>
 
-          {/* Mood Cards */}
-          <div className="mt-12 flex justify-center w-full px-6">
-            <MoodCards onSelectMood={handleMoodSelect} />
-          </div>
+          {/* CategoryBar */}
+          <CategoryBar
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
 
-          {/* Playlist results */}
-          {showDropdown && playlists.length > 0 && (
+          {/* MoodCards */}
+          <MoodCards
+            selectedCategory={selectedCategory}
+            onSelectMood={handleMoodSelect}
+          />
+
+          {/* Spotify Playlists */}
+          {playlists.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 p-8 w-full max-w-5xl mx-auto">
               {playlists.map((p) => (
                 <a
