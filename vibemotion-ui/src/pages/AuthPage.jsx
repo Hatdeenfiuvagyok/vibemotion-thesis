@@ -15,19 +15,23 @@ export default function AuthPage() {
     const token = localStorage.getItem("vibemotion_token");
     if (token) {
       fetchMe(token).catch(() => {
+        console.log("Invalid token found, clearing it.");
         localStorage.removeItem("vibemotion_token");
       });
     }
   }, []);
 
   const fetchMe = async (token) => {
-    const res = await axios.get("http://localhost:5000/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setUser(res.data.user);
+    try {
+      const res = await axios.get("http://localhost:5000/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(res.data.user);
+    } catch (err) {
+      throw new Error("Unauthorized");
+    }
   };
 
-  // ❌ Nincs trim(), copy-paste kompatibilis
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -44,7 +48,6 @@ export default function AuthPage() {
         );
         setInfo(res.data.message || "Check your email for the new password!");
         setForgotPassword(false);
-        setForm({ username: "", email: "", password: "" });
       } else {
         const url = isLogin ? "/api/auth/login" : "/api/auth/register";
         const res = await axios.post(`http://localhost:5000${url}`, form);
@@ -61,7 +64,6 @@ export default function AuthPage() {
   const handleLogout = () => {
     localStorage.removeItem("vibemotion_token");
     setUser(null);
-    setForm({ username: "", email: "", password: "" });
   };
 
   if (user) {
@@ -99,6 +101,7 @@ export default function AuthPage() {
             Your mood. Your playlist. Log in for the full experience.
           </p>
         </div>
+
         <div className="relative z-10 flex flex-col items-center w-full max-w-md mx-auto space-y-8 mt-48">
           <div className="w-full flex flex-col">
             {!forgotPassword && (
@@ -106,6 +109,7 @@ export default function AuthPage() {
                 {isLogin ? "Welcome Back" : "Join to Vibemotion"}
               </h2>
             )}
+
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-2">
               {!isLogin && !forgotPassword && (
                 <input name="username" value={form.username} onChange={handleChange} placeholder="Username" className="p-3 rounded-lg bg-[#160022aa] text-white border border-[#a855f755] focus:outline-none" />
@@ -114,17 +118,21 @@ export default function AuthPage() {
               {!forgotPassword && (
                 <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Password" className="p-3 rounded-lg bg-[#160022aa] text-white border border-[#a855f755] focus:outline-none" />
               )}
+
               {error && <div className="text-red-400 text-sm">{error}</div>}
               {info && <div className="text-green-400 text-sm">{info}</div>}
+
               <button type="submit" disabled={loading} className="mt-3 p-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-glow text-white font-semibold hover:scale-105 transition">
                 {loading ? "Please wait..." : forgotPassword ? "Send new password" : isLogin ? "Login" : "Register"}
               </button>
             </form>
+
             {!forgotPassword && isLogin && (
               <p className="text-sm text-neon-glow underline mt-2 cursor-pointer text-center" onClick={() => setForgotPassword(true)}>
                 Forgot Password?
               </p>
             )}
+
             {forgotPassword && (
               <div className="flex flex-col items-center mt-4">
                 <button onClick={() => setForgotPassword(false)} className="text-neon-glow underline text-sm">
@@ -132,7 +140,9 @@ export default function AuthPage() {
                 </button>
               </div>
             )}
+
             {forgotPassword && <p className="text-sm text-gray-300 mt-2 text-center">Enter your email to reset your password.</p>}
+
             {!forgotPassword && (
               <p className="text-sm sm:text-base text-gray-300 mt-6 text-center">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
