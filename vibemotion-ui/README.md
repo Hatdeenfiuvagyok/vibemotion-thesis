@@ -18,4 +18,4 @@ to create a visually immersive experience.
 
 Clone the repository:
 ```bash
-git clone https://github.com/<username>/moodify-thesis.git
+git clone https://github.com/Hatdeenfiuvagyok/moodify-thesis.git

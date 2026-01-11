@@ -1,33 +1,63 @@
-import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
+// src/context/AuthContext.js
+import { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Listen for auth changes
   useEffect(() => {
-    const token = localStorage.getItem("vibemotion_token");
-    if (token) {
-      axios
-        .get("http://localhost:5000/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => setUser(res.data.user))
-        .catch(() => {
-          localStorage.removeItem("vibemotion_token");
-          setUser(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user || null);
       setLoading(false);
-    }
+    });
+
+    return () => listener.subscription.unsubscribe();
   }, []);
 
+  // Google Login                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+  const signInWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "http://localhost:3000/auth/callback",
+      },
+    });
+  };
+
+  // Spotify Login
+  const signInWithSpotify = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "spotify",
+      options: {
+        redirectTo: "http://localhost:3000/auth/callback",
+        scopes: "user-read-email playlist-read-private",
+      },
+    });
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider
+      value={{ user, loading, signInWithGoogle, signInWithSpotify, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}

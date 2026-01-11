@@ -39,7 +39,6 @@ function SearchBar() {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-md mx-auto mt-10">
-      {/* 🔹 Input mező */}
       <div className="relative">
         <input
           type="text"
@@ -53,7 +52,6 @@ function SearchBar() {
         <div className="absolute right-3 top-3 text-neon-glow">🎵</div>
       </div>
 
-      {/* 🔹 Dropdown animáció */}
       <AnimatePresence>
         {showDropdown && playlists.length > 0 && (
           <motion.div

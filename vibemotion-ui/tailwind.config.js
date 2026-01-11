@@ -5,9 +5,9 @@ module.exports = {
     extend: {
       colors: {
         neon: {
-          purple: "#a855f7", // világos neon lila
-          dark: "#2a0a4a",   // sötét lila háttér
-          glow: "#c084fc",   // lilás fény
+          purple: "#a855f7",
+          dark: "#2a0a4a",
+          glow: "#c084fc",
         },
       },
     },

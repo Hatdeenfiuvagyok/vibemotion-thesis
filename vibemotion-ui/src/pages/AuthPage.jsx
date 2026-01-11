@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import "../styles/clipShapes.css";
 import WelcomeAnimation from "../components/WelcomeAnimation";
@@ -15,65 +15,82 @@ export default function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("vibemotion_token");
-    if (token) {
-      fetchMe(token).catch(() => {
-        localStorage.removeItem("vibemotion_token");
-      });
-    }
+    supabase.auth.getSession().then((res) => {
+      if (res.data?.session?.user) {
+        setUser(res.data.session.user);
+      }
+    });
   }, []);
-
-  const fetchMe = async (token) => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(res.data.user);
-    } catch (err) {
-      throw new Error("Unauthorized");
-    }
-  };
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+const handleResetPassword = async () => {
+  setLoading(true);
+  setError("");
+  setInfo("");
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+      redirectTo: "http://localhost:3000/update-password",
+    });
+    if (error) throw error;
+    setInfo("Check your email for the reset link!");
+    setForgotPassword(false);
+  } catch (err) {
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setInfo("");
+
     try {
       if (forgotPassword) {
-        const res = await axios.post(
-          `http://localhost:5000/api/auth/forgot-password`,
-          { email: form.email }
-        );
-        setInfo(res.data.message || "Check your email for the new password!");
-        setForgotPassword(false);
+        await handleResetPassword();
+        return;
+      }
+
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        });
+        if (error) throw error;
+
+        const session = await supabase.auth.getSession();
+        setUser(session.data.session.user);
       } else {
-        const url = isLogin ? "/api/auth/login" : "/api/auth/register";
-        const res = await axios.post(`http://localhost:5000${url}`, form);
-        localStorage.setItem("vibemotion_token", res.data.token);
-        setUser(res.data.user);
+        const { error } = await supabase.auth.signUp({
+          email: form.email,
+          password: form.password,
+          options: { data: { username: form.username } },
+        });
+        if (error) throw error;
+        setInfo("Check your email to confirm registration!");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong");
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("vibemotion_token");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
   };
 
-  // 🔹 Ha van user → Welcome képernyő animációval
   if (user) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#2a0a4a] to-[#100018] text-white relative">
         <h2 className="text-3xl font-bold mb-2">
-          Welcome, {user.username || user.email}!
+          Welcome, {user.user_metadata?.username || user.email}!
         </h2>
         <p className="text-neon-purple mt-3 text-lg animate-pulse">
           Preparing your Vibemotion experience...
@@ -85,12 +102,11 @@ export default function AuthPage() {
           Log out
         </button>
 
-        <WelcomeAnimation onComplete={() => navigate("/")} />
+        <WelcomeAnimation onComplete={() => navigate("/main")} />
       </div>
     );
   }
 
-  // 🔹 Auth űrlap
   return (
     <div
       className="relative w-screen h-screen overflow-hidden bg-center bg-no-repeat"
@@ -102,6 +118,7 @@ export default function AuthPage() {
     >
       <div className="absolute top-0 h-full flex flex-col items-center justify-center left-0 md:left-auto md:right-0 px-6 sm:px-12 md:px-16 lg:px-20 w-full md:w-[42%] lg:w-[40%] max-w-full transition-all duration-500 ease-in-out">
         <div className="absolute inset-0 bg-[#1b002bdd] shadow-2xl panel-clip rounded-l-[100px]" />
+
         <div className="absolute mt-24 top-12 w-full text-center z-10 px-2">
           <h1
             className="font-extrabold mb-3 text-neon-purple drop-shadow-[0_0_25px_#a855f7]"
@@ -160,7 +177,8 @@ export default function AuthPage() {
               {info && <div className="text-green-400 text-sm">{info}</div>}
 
               <button
-                type="submit"
+                type={forgotPassword ? "button" : "submit"}
+                onClick={forgotPassword ? handleResetPassword : undefined}
                 disabled={loading}
                 className="mt-3 p-3 rounded-xl bg-gradient-to-r from-neon-purple to-neon-glow text-white font-semibold hover:scale-105 transition"
               >
@@ -172,6 +190,41 @@ export default function AuthPage() {
                   ? "Login"
                   : "Register"}
               </button>
+
+              {/* GOOGLE & SPOTIFY gombok visszahelyezve */}
+              {isLogin && !forgotPassword && (
+                <div className="flex flex-col gap-3 mt-4">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.location.assign("http://localhost:5000/api/auth/google")
+                    }
+                    className="w-full p-3 rounded-xl bg-white text-black font-semibold flex items-center justify-center gap-2 hover:scale-105 transition"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/assets/g-logo.png`}
+                      alt="Google"
+                      className="w-5 h-5"
+                    />
+                    Continue with Google
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.location.assign("http://localhost:5000/api/auth/spotify")
+                    }
+                    className="w-full p-3 rounded-xl bg-black text-white font-semibold flex items-center justify-center gap-2 hover:scale-105 transition"
+                  >
+                    <img
+                      src={`${process.env.PUBLIC_URL}/assets/s-logo1.png`}
+                      alt="Spotify"
+                      className="w-5 h-5"
+                    />
+                    Continue with Spotify
+                  </button>
+                </div>
+              )}
             </form>
 
             {!forgotPassword && isLogin && (

@@ -1,3 +1,4 @@
+// src/pages/MainPage.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -5,6 +6,7 @@ import SideBar from "../components/SideBar";
 import MoodCards, { moods } from "../components/MoodCards";
 import SearchBar from "../components/SearchBar";
 import CategoryBar from "../components/CategoryBar";
+import { supabase } from "../supabaseClient"; // kiegészítés
 
 export default function MainPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -13,21 +15,17 @@ export default function MainPage() {
   const [playlists, setPlaylists] = useState([]);
   const navigate = useNavigate();
 
-  // Felhasználó lekérése
+  // Felhasználó lekérése Supabase session alapján
   useEffect(() => {
-    const token = localStorage.getItem("vibemotion_token");
-    if (!token) navigate("/auth");
-    else {
-      axios
-        .get("http://localhost:5000/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => setUsername(res.data.user.username))
-        .catch(() => {
-          localStorage.removeItem("vibemotion_token");
-          navigate("/auth");
-        });
-    }
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data?.session?.user) {
+        navigate("/auth");
+      } else {
+        setUsername(data.session.user.user_metadata?.username || data.session.user.email);
+      }
+    };
+    fetchUser();
   }, [navigate]);
 
   // Mobil sidebar automatikus bezárása resizekor
@@ -39,8 +37,8 @@ export default function MainPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("vibemotion_token");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     navigate("/auth");
   };
 
@@ -99,24 +97,18 @@ export default function MainPage() {
 
         {/* Main content */}
         <div className="flex-1 md:ml-60 px-4 sm:px-8">
-          {/* SearchBar */}
-          <div className="mt-4">
-            <SearchBar />
-          </div>
+          <SearchBar />
 
-          {/* CategoryBar */}
           <CategoryBar
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
 
-          {/* MoodCards */}
           <MoodCards
             selectedCategory={selectedCategory}
             onSelectMood={handleMoodSelect}
           />
 
-          {/* Spotify Playlists */}
           {playlists.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12 p-8 w-full max-w-5xl mx-auto">
               {playlists.map((p) => (

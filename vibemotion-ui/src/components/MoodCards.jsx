@@ -10,7 +10,7 @@ export const moods = [
   { name: "Party", image: "/assets/moods/moodcards_party.jpg", category: "Fun" },
   { name: "Calm", image: "/assets/moods/moodcards_calm.jpg", category: "Relax" },
   { name: "Motivation", image: "/assets/moods/moodcards_motivation.jpg", category: "Workout" },
-  { name: "Sleepy", image: "/assets/moods/moodcards_sleepy.jpg", category: "Chill" },
+  { name: "Sleíepy", image: "/assets/moods/moodcards_sleepy.jpg", category: "Chill" },
   { name: "Epic", image: "/assets/moods/moodcards_epic.jpg", category: "Adventure" },
   { name: "Romantic", image: "/assets/moods/moodcards_romantic.jpg", category: "Romance" },
   { name: "Melancholic", image: "/assets/moods/moodcards_melancholic.jpg", category: "Sad" },
@@ -19,9 +19,7 @@ export const moods = [
   { name: "Nature", image: "/assets/moods/moodcards_nature.jpg", category: "Relax" },
   { name: "Workout", image: "/assets/moods/moodcards_workout.jpg", category: "Workout" },
   { name: "Gaming", image: "/assets/moods/moodcards_gaming.jpg", category: "Fun" },
-  { name: "Sadness", image: "/assets/moods/moodcards_sadness.jpg", category: "Sad" },
   { name: "Happy Vibes", image: "/assets/moods/moodcards_happyvibes.jpg", category: "Joy" },
-  { name: "Focus Energy", image: "/assets/moods/moodcards_focus_energy.jpg", category: "Study" },
   { name: "Late Night", image: "/assets/moods/moodcards_latenight.jpg", category: "Chill" },
   { name: "Morning", image: "/assets/moods/moodcards_morning.jpg", category: "Joy" },
   { name: "Drive", image: "/assets/moods/moodcards_drive.jpg", category: "Adventure" },
@@ -32,9 +30,7 @@ export const moods = [
   { name: "Classical", image: "/assets/moods/moodcards_classical.jpg", category: "Study" },
   { name: "Jazz", image: "/assets/moods/moodcards_jazz.jpg", category: "Relax" },
   { name: "Electronic", image: "/assets/moods/moodcards_electronic.jpg", category: "Fun" },
-  { name: "Meditation", image: "/assets/moods/moodcards_meditation.jpg", category: "Relax" },
-  { name: "Sleep", image: "/assets/moods/moodcards_sleep.jpg", category: "Chill" },
-  { name: "Happy Acoustic", image: "/assets/moods/moodcards_acoustic.jpg", category: "Joy" },
+  { name: "Meditation", image: "/assets/moods/moodcards_meditation.jpg", category: "Relax" }
 ];
 
 function MoodCards({ onSelectMood, selectedCategory }) {
