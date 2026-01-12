@@ -1,21 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* index.css (kiegészítés) */
-
-/* Diagonális vágás */
 .clip-diagonal {
   clip-path: polygon(18% 0%, 100% 0%, 100% 100%, 0% 100%);
 }
 
-/* Íves / félkörös vágás - jobb oldal ívvel "beleharap" a képbe */
 .clip-curve {
-  /* ellipse(rx ry at cx cy) - beállítható, kísérletezz a százalékekkel */
   clip-path: ellipse(60% 100% at 100% 50%);
 }
 
-/* Finom beúszás (opcionális) */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }

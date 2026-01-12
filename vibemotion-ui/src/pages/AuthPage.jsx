@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/pages/AuthPage.jsx
+import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 import "../styles/clipShapes.css";
@@ -14,78 +15,86 @@ export default function AuthPage() {
   const [info, setInfo] = useState("");
   const navigate = useNavigate();
 
+  // Memoized change handler → nem kell újrafunkcionálni minden render
+  const handleChange = useCallback((e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
+
+  // Felhasználó lekérése egyszer → csak mount
   useEffect(() => {
+    let mounted = true;
     supabase.auth.getSession().then((res) => {
-      if (res.data?.session?.user) {
+      if (mounted && res.data?.session?.user) {
         setUser(res.data.session.user);
       }
     });
+    return () => (mounted = false);
   }, []);
 
-  const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
-const handleResetPassword = async () => {
-  setLoading(true);
-  setError("");
-  setInfo("");
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
-      redirectTo: "http://localhost:3000/update-password",
-    });
-    if (error) throw error;
-    setInfo("Check your email for the reset link!");
-    setForgotPassword(false);
-  } catch (err) {
-    setError(err.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleResetPassword = useCallback(async () => {
     setLoading(true);
     setError("");
     setInfo("");
-
     try {
-      if (forgotPassword) {
-        await handleResetPassword();
-        return;
-      }
-
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: form.email,
-          password: form.password,
-        });
-        if (error) throw error;
-
-        const session = await supabase.auth.getSession();
-        setUser(session.data.session.user);
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email: form.email,
-          password: form.password,
-          options: { data: { username: form.username } },
-        });
-        if (error) throw error;
-        setInfo("Check your email to confirm registration!");
-      }
+      const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+        redirectTo: "http://localhost:3000/update-password",
+      });
+      if (error) throw error;
+      setInfo("Check your email for the reset link!");
+      setForgotPassword(false);
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
-  };
+  }, [form.email]);
 
-  const handleLogout = async () => {
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      setError("");
+      setInfo("");
+
+      try {
+        if (forgotPassword) {
+          await handleResetPassword();
+          return;
+        }
+
+        if (isLogin) {
+          const { error } = await supabase.auth.signInWithPassword({
+            email: form.email,
+            password: form.password,
+          });
+          if (error) throw error;
+
+          const session = await supabase.auth.getSession();
+          setUser(session.data.session.user);
+        } else {
+          const { error } = await supabase.auth.signUp({
+            email: form.email,
+            password: form.password,
+            options: { data: { username: form.username } },
+          });
+          if (error) throw error;
+          setInfo("Check your email to confirm registration!");
+        }
+      } catch (err) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [forgotPassword, handleResetPassword, isLogin, form]
+  );
+
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
-  };
+  }, []);
 
+  // Ha user van → Welcome animation
   if (user) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#2a0a4a] to-[#100018] text-white relative">
@@ -107,6 +116,7 @@ const handleResetPassword = async () => {
     );
   }
 
+  // Login/Register form
   return (
     <div
       className="relative w-screen h-screen overflow-hidden bg-center bg-no-repeat"
@@ -116,6 +126,7 @@ const handleResetPassword = async () => {
         backgroundSize: "cover",
       }}
     >
+      {/* Form panel */}
       <div className="absolute top-0 h-full flex flex-col items-center justify-center left-0 md:left-auto md:right-0 px-6 sm:px-12 md:px-16 lg:px-20 w-full md:w-[42%] lg:w-[40%] max-w-full transition-all duration-500 ease-in-out">
         <div className="absolute inset-0 bg-[#1b002bdd] shadow-2xl panel-clip rounded-l-[100px]" />
 
@@ -191,7 +202,7 @@ const handleResetPassword = async () => {
                   : "Register"}
               </button>
 
-              {/* GOOGLE & SPOTIFY gombok visszahelyezve */}
+              {/* GOOGLE & SPOTIFY gombok */}
               {isLogin && !forgotPassword && (
                 <div className="flex flex-col gap-3 mt-4">
                   <button

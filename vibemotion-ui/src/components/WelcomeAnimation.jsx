@@ -1,13 +1,13 @@
+// src/components/WelcomeAnimation.jsx
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 
-export default function WelcomeAnimation({ onComplete }) {
+const WelcomeAnimation = React.memo(({ onComplete }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (onComplete) {
-        onComplete();
-      }
-    }, 3000); // 3 másodperc után navigál
+      onComplete?.();
+    }, 3000); // 3 másodperc
+
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -19,4 +19,6 @@ export default function WelcomeAnimation({ onComplete }) {
       transition={{ duration: 3, ease: "easeInOut" }}
     />
   );
-}
+});
+
+export default WelcomeAnimation;

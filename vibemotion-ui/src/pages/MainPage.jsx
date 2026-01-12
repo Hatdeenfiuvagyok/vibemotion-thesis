@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SideBar from "../components/SideBar";
-import MoodCards, { moods } from "../components/MoodCards";
+import MoodCards from "../components/MoodCards";
 import SearchBar from "../components/SearchBar";
 import CategoryBar from "../components/CategoryBar";
-import { supabase } from "../supabaseClient"; // kiegészítés
+import { supabase } from "../supabaseClient";
 
 export default function MainPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -15,7 +15,6 @@ export default function MainPage() {
   const [playlists, setPlaylists] = useState([]);
   const navigate = useNavigate();
 
-  // Felhasználó lekérése Supabase session alapján
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -28,7 +27,6 @@ export default function MainPage() {
     fetchUser();
   }, [navigate]);
 
-  // Mobil sidebar automatikus bezárása resizekor
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768) setSidebarOpen(false);
@@ -42,7 +40,6 @@ export default function MainPage() {
     navigate("/auth");
   };
 
-  // Mood kiválasztás → Spotify API lekérdezés
   const handleMoodSelect = async (moodName) => {
     try {
       const response = await axios.get(
@@ -56,14 +53,12 @@ export default function MainPage() {
   };
 
   return (
-    <div
-      className="min-h-screen text-white flex flex-col"
-      style={{
-        background: "linear-gradient(to bottom, #000000, #1a002e, #3b0066)",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      {/* Navbar */}
+    <div className="min-h-screen text-white flex flex-col relative">
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-[#000000] via-[#1a002e] to-[#3b0066] z-0"
+        style={{ backgroundAttachment: "fixed" }}
+      />
+
       <div className="w-full flex justify-between items-center p-6 fixed top-0 left-0 z-50
                       bg-black/70 backdrop-blur-md">
         <div className="flex items-center gap-4">
@@ -91,11 +86,9 @@ export default function MainPage() {
         )}
       </div>
 
-      <div className="flex pt-24">
-        {/* Sidebar */}
+      <div className="flex pt-24 relative z-10">
         <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        {/* Main content */}
         <div className="flex-1 md:ml-60 px-4 sm:px-8">
           <SearchBar />
 
@@ -119,11 +112,14 @@ export default function MainPage() {
                   rel="noopener noreferrer"
                   className="border border-neon-purple/40 rounded-xl shadow-[0_0_15px_#a855f750] hover:shadow-[0_0_25px_#a855f7] transition-transform bg-[#1a002e]/60 backdrop-blur-sm hover:scale-105"
                 >
-                  <img
-                    src={p.images[0]?.url}
-                    alt={p.name}
-                    className="rounded-t-xl w-full h-48 object-cover opacity-90 hover:opacity-100 transition"
-                  />
+                  <div className="w-full aspect-[4/3] overflow-hidden rounded-t-xl">
+                    <img
+                      src={p.images[0]?.url}
+                      alt={p.name}
+                      className="w-full h-full object-cover opacity-90 hover:opacity-100 transition"
+                      loading="lazy"
+                    />
+                  </div>
                   <div className="p-4">
                     <h2 className="text-xl font-semibold text-neon-glow">{p.name}</h2>
                     <p className="text-sm text-gray-400 mt-2">

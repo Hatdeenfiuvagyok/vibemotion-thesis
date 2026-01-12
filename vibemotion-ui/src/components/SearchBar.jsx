@@ -1,32 +1,51 @@
-import React, { useState, useRef, useEffect } from "react";
+// src/components/SearchBar.jsx
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import debounce from "lodash.debounce";
 
-function SearchBar() {
+function SearchBar({ cachedPlaylists }) {
   const [mood, setMood] = useState("");
   const [playlists, setPlaylists] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const containerRef = useRef(null);
 
-  // 🔍 API hívás
-  const handleSearch = async (value) => {
-    setMood(value);
-    if (value.trim() === "") {
-      setPlaylists([]);
-      return;
-    }
+  const fetchPlaylists = useCallback(
+    async (value) => {
+      if (!value.trim()) {
+        setPlaylists([]);
+        setShowDropdown(false);
+        return;
+      }
 
-    try {
-      const response = await axios.get(`http://localhost:5000/api/playlists?mood=${value}`);
-      const filtered = response.data.filter((p) => p !== null);
-      setPlaylists(filtered);
-      setShowDropdown(true);
-    } catch (error) {
-      console.error("Error fetching playlists:", error);
-    }
+      if (cachedPlaylists.current[value]) {
+        setPlaylists(cachedPlaylists.current[value]);
+        setShowDropdown(true);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/playlists?mood=${value}`
+        );
+        const filtered = response.data.filter((p) => p !== null);
+        cachedPlaylists.current[value] = filtered;
+        setPlaylists(filtered);
+        setShowDropdown(true);
+      } catch (error) {
+        console.error("Error fetching playlists:", error);
+      }
+    },
+    [cachedPlaylists]
+  );
+
+  const debouncedFetch = useCallback(debounce(fetchPlaylists, 300), [fetchPlaylists]);
+
+  const handleChange = (e) => {
+    setMood(e.target.value);
+    debouncedFetch(e.target.value);
   };
 
-  // 🧠 Bezárás ha máshova kattintunk
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -44,7 +63,7 @@ function SearchBar() {
           type="text"
           placeholder="Enter a mood (happy, chill, sad...)"
           value={mood}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={handleChange}
           className="w-full p-3 rounded-xl border border-neon-purple/40 bg-neon-dark/60 
                      text-white focus:outline-none focus:ring-2 focus:ring-neon-purple
                      placeholder-gray-400 shadow-[0_0_10px_#a855f755] transition-all duration-300"

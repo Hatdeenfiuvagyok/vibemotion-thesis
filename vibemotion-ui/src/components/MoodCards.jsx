@@ -1,3 +1,4 @@
+// src/components/MoodCards.jsx
 import React from "react";
 
 export const moods = [
@@ -72,6 +73,7 @@ function MoodCards({ onSelectMood, selectedCategory }) {
             src={mood.image}
             alt={mood.name}
             className="absolute inset-0 w-full h-full object-cover opacity-70"
+            loading="lazy"
           />
 
           {/* Overlay */}

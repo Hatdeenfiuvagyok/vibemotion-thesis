@@ -1,13 +1,32 @@
-import React from "react";
+// src/components/SideBar.jsx
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-export default function SideBar({ isOpen, onClose }) {
+const menuItems = [
+  { name: "Profile", path: "/profile" },
+  { name: "Favourite", path: "/favourite" },
+];
+
+function SideBarComponent({ isOpen, onClose }) {
   const location = useLocation();
 
-  const menuItems = [
-    { name: "Profile", path: "/profile" },
-    { name: "Favourite", path: "/favourite" },
-  ];
+  // Memoizáljuk a menüpontokat → nem kell újra számolni minden render
+  const renderedMenu = useMemo(
+    () =>
+      menuItems.map((item) => (
+        <Link
+          key={item.name}
+          to={item.path}
+          className={`p-3 rounded-lg hover:bg-neon-purple/40 transition ${
+            location.pathname === item.path ? "bg-neon-purple/60" : ""
+          }`}
+          onClick={onClose}
+        >
+          {item.name}
+        </Link>
+      )),
+    [location.pathname, onClose]
+  );
 
   return (
     <>
@@ -19,6 +38,7 @@ export default function SideBar({ isOpen, onClose }) {
         />
       )}
 
+      {/* Sidebar */}
       <div
         className={`fixed top-24 left-0 h-[calc(100%-6rem)] w-60 transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0 bg-gradient-to-b from-black via-[#1a002e] to-[#3b0066]" : "-translate-x-full"} 
@@ -33,20 +53,12 @@ export default function SideBar({ isOpen, onClose }) {
         </button>
 
         <nav className="flex flex-col gap-4 mt-6 p-6">
-          {menuItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`p-3 rounded-lg hover:bg-neon-purple/40 transition ${
-                location.pathname === item.path ? "bg-neon-purple/60" : ""
-              }`}
-              onClick={onClose}
-            >
-              {item.name}
-            </Link>
-          ))}
+          {renderedMenu}
         </nav>
       </div>
     </>
   );
 }
+
+// React.memo → stabil render, csak ha props változik
+export default React.memo(SideBarComponent);
