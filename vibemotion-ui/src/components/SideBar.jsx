@@ -10,7 +10,6 @@ const menuItems = [
 function SideBarComponent({ isOpen, onClose }) {
   const location = useLocation();
 
-  // Memoizáljuk a menüpontokat → nem kell újra számolni minden render
   const renderedMenu = useMemo(
     () =>
       menuItems.map((item) => (
@@ -30,7 +29,6 @@ function SideBarComponent({ isOpen, onClose }) {
 
   return (
     <>
-      {/* Mobil overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-40 md:hidden"
@@ -38,13 +36,11 @@ function SideBarComponent({ isOpen, onClose }) {
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={`fixed top-24 left-0 h-[calc(100%-6rem)] w-60 transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0 bg-gradient-to-b from-black via-[#1a002e] to-[#3b0066]" : "-translate-x-full"} 
           z-40 md:translate-x-0 md:bg-transparent`}
       >
-        {/* X gomb mobilon */}
         <button
           className="text-white text-3xl self-end m-4 md:hidden"
           onClick={onClose}

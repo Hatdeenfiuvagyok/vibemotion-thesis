@@ -15,12 +15,10 @@ export default function AuthPage() {
   const [info, setInfo] = useState("");
   const navigate = useNavigate();
 
-  // Memoized change handler → nem kell újrafunkcionálni minden render
   const handleChange = useCallback((e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }, []);
 
-  // Felhasználó lekérése egyszer → csak mount
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then((res) => {

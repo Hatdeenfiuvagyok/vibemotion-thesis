@@ -3,7 +3,7 @@ import React from "react";
 
 export const moods = [
   { name: "Happy", image: "/assets/moods/moodcards_happy.jpg", category: "Joy" },
-  { name: "Chill", image: "/assets/moods/moodcards_chill2.jpeg", category: "Relax" },
+  { name: "Chill", image: "/assets/moods/moodcards_chill.jpg", category: "Relax" },
   { name: "Sad", image: "/assets/moods/moodcards_sad.jpg", category: "Melancholy" },
   { name: "Focus", image: "/assets/moods/moodcards_focus.png", category: "Study" },
   { name: "Energy", image: "/assets/moods/moodcards_energy.jpg", category: "Workout" },
@@ -76,10 +76,8 @@ function MoodCards({ onSelectMood, selectedCategory }) {
             loading="lazy"
           />
 
-          {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
 
-          {/* Alsó szöveges rész */}
           <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/50 backdrop-blur-sm rounded-b-2xl flex flex-col items-center">
             <h2 className="text-white text-lg sm:text-2xl font-bold drop-shadow-lg tracking-wide">
               {mood.name}
