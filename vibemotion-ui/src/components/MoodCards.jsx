@@ -11,7 +11,7 @@ export const moods = [
   { name: "Party", image: "/assets/moods/moodcards_party.jpg", category: "Fun" },
   { name: "Calm", image: "/assets/moods/moodcards_calm.jpg", category: "Relax" },
   { name: "Motivation", image: "/assets/moods/moodcards_motivation.jpg", category: "Workout" },
-  { name: "Sleíepy", image: "/assets/moods/moodcards_sleepy.jpg", category: "Chill" },
+  { name: "Sleepy", image: "/assets/moods/moodcards_sleepy.jpg", category: "Chill" },
   { name: "Epic", image: "/assets/moods/moodcards_epic.jpg", category: "Adventure" },
   { name: "Romantic", image: "/assets/moods/moodcards_romantic.jpg", category: "Romance" },
   { name: "Melancholic", image: "/assets/moods/moodcards_melancholic.jpg", category: "Sad" },

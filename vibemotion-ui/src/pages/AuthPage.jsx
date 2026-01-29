@@ -92,7 +92,6 @@ export default function AuthPage() {
     setUser(null);
   }, []);
 
-  // Ha user van → Welcome animation
   if (user) {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#2a0a4a] to-[#100018] text-white relative">
