@@ -1,9 +1,9 @@
-# 🎧 Moodify Thesis
+# 🎧 Vibemotion Thesis
 
 A music-based mood selection interface built as part of my **Bachelor’s Thesis in Computer Science**.
 
 ## 🎯 Overview
-Moodify is a web application that recommends playlists based on the user's mood.
+Vibemotion is a web application that recommends playlists based on the user's mood.
 It uses **Spotify Web API** for music data, **Framer Motion** for animations, and **color theory**
 to create a visually immersive experience.
 
@@ -18,4 +18,4 @@ to create a visually immersive experience.
 
 Clone the repository:
 ```bash
-git clone https://github.com/Hatdeenfiuvagyok/moodify-thesis.git
+git clone https://github.com/Hatdeenfiuvagyok/vibemotion-thesis.git
